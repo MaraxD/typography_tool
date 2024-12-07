@@ -1,15 +1,14 @@
-// typography tool //<>//
+// typography tool //<>// //<>// //<>//
 import controlP5.*;
 
 ControlP5 cp5;
 ControlP5 guiControllers;
 
-String[] textfieldNames = {"tf1", "tf2", "tf3", "tf4", "tf5"};
 int y=20;
 int spacing=60;
 PFont font, textFont;
 String inputWord="", selectedFont;
-int fontListSize;
+int fontListSize, i=0;
 String[] fontList;
 DropdownList dropDownElement;
 Button colorButton;
@@ -30,21 +29,33 @@ void setup() {
   size(600, 600);
   background(color(255, 240, 209));
   gui();
- 
 }
 
 void draw() {
   if (!inputWord.equals("")) {
     // going to the editor page
-    background(color(255, 240, 209));
+    //background(color(255, 240, 209));
     guiControllers.show();
-    
+
     stroke(color(121, 87, 87));
     //upper line
-    line(0,50,width, 50);
-    
+    line(0, 50, width, 50);
+
     //bottom line
-    line(0,height-50,width, height-50);
+    line(0, height-50, width, height-50);
+
+    // time to draw whne the mouse is pressed
+    if (mousePressed) {
+      if(mouseY>70 && mouseY<height-50){
+        delay(80);
+        text(inputWord.charAt(i), mouseX, mouseY);
+        if (i == inputWord.length()-1) {
+          i=0;
+        } else {
+          i++;
+        }
+      }
+    }
   } else {
     // animate the intro text
     fill(color(255, 240, 209));
@@ -62,24 +73,16 @@ void draw() {
   }
 }
 
-//void mousePressed() {
-//  println(dropDownElement != null);
-//  if (dropDownElement != null) {
-//    if (isDLOpen) {
-//      // set the height of a pulldown menu, should always be a multiple of itemHeight
-//      dropDownElement.setHeight(0);
-//      isDLOpen=false;
-//    } else {
-//      dropDownElement.setHeight(210); //close the dropdown list
-//      isDLOpen=true;
-//    }
-//  }
-//}
+void keyPressed(){
+  if(keyCode == 10 && !inputWord.equals("")){
+    background(color(255, 240, 209));
+  }
+}
 
 // TODO refactor
-void controlEvent(ControlEvent theEvent) { //<>//
+void controlEvent(ControlEvent theEvent) {
   // getting the input from the text box
-  if (theEvent.isAssignableFrom(Textfield.class)) { //<>//
+  if (theEvent.isAssignableFrom(Textfield.class)) {
     inputWord = theEvent.getStringValue();
     println("controlEvent: accessing a string from controller '"
       +theEvent.getName()+"': "
