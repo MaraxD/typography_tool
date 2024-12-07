@@ -1,73 +1,50 @@
-// typography tool
+// typography tool //<>//
 import controlP5.*;
 
 ControlP5 cp5;
+ControlP5 guiControllers;
 
 String[] textfieldNames = {"tf1", "tf2", "tf3", "tf4", "tf5"};
 int y=20;
 int spacing=60;
 PFont font, textFont;
-String inputWord="";
+String inputWord="", selectedFont;
 int fontListSize;
 String[] fontList;
 DropdownList dropDownElement;
-boolean isDLOpen=false;
+Button colorButton;
+boolean isDLOpen=true, btnClicked=false;
+MyControlListener myListener;
+PGraphics result;
+
+// creating a custom event listener by inhereting the ControlListener interface
+class MyControlListener implements ControlListener {
+  public void controlEvent(ControlEvent theEvent) {
+    println("i got an event from color btn, " +
+      theEvent.getController().getValue());
+  }
+}
 
 
 void setup() {
   size(600, 600);
   background(color(255, 240, 209));
-  // create a font for the main text
-  fontList=PFont.list();
-  fontListSize=fontList.length;
-
-  // create a font for the text box
-  font=createFont("arial", 40);
-  cp5=new ControlP5(this);
-
-  // create the underline
-  line(width/2-130, height/2-60, width/2+130, height/2-60);
-
-  // create the text box
-  cp5.addTextfield("")
-    .setPosition(width/2-130, height/2-100)
-    .setSize(260, 40)
-    .setFont(font)
-    .setColor(color(102, 67, 67))
-    .setColorBackground(color(255, 240, 209))
-    .setColorForeground(color(255, 240, 209))
-    .setColorActive(color(255, 240, 209))
-    ;
-
-  dropDownElement=cp5.addDropdownList("font-list")
-    .setPosition(width-240, 10)
-    .setSize(100, 30)
-    .setColorBackground(color(121, 87, 87));
-  dropDownElement.setItemHeight(20);
-  dropDownElement.setBarHeight(15);
-  dropDownElement.getCaptionLabel().set("Font");
-  //dropDownElement.getCaptionLabel().style().marginTop = 3;
-  //dropDownElement.getCaptionLabel().style().marginLeft = 3;
-  //dropDownElement.getValueLabel().style().marginTop = 3;
-  for (int i=0; i<fontListSize; i++) {
-    dropDownElement.addItem(fontList[i], fontList[i]);
-  }
-  //ddl.scroll(0);
-  dropDownElement.setColorBackground(color(60));
-  dropDownElement.setColorActive(color(255, 128));
-
-  textFont(font);
+  gui();
+ 
 }
 
 void draw() {
   if (!inputWord.equals("")) {
-    noLoop();
     // going to the editor page
     background(color(255, 240, 209));
-    cp5.addButton("Color")
-      .setPosition(width-120, 10)
-      .setSize(100, 30)
-      .setColorBackground(color(121, 87, 87));
+    guiControllers.show();
+    
+    stroke(color(121, 87, 87));
+    //upper line
+    line(0,50,width, 50);
+    
+    //bottom line
+    line(0,height-50,width, height-50);
   } else {
     // animate the intro text
     fill(color(255, 240, 209));
@@ -85,20 +62,24 @@ void draw() {
   }
 }
 
-void mousePressed() {
-  if (!isDLOpen) {
-    // set the height of a pulldown menu, should always be a multiple of itemHeight
-    dropDownElement.setHeight(210);
-    isDLOpen=true;
-  } else {
-    dropDownElement.setHeight(0); //close the dropdown list
-    isDLOpen=false;
-  }
-}
+//void mousePressed() {
+//  println(dropDownElement != null);
+//  if (dropDownElement != null) {
+//    if (isDLOpen) {
+//      // set the height of a pulldown menu, should always be a multiple of itemHeight
+//      dropDownElement.setHeight(0);
+//      isDLOpen=false;
+//    } else {
+//      dropDownElement.setHeight(210); //close the dropdown list
+//      isDLOpen=true;
+//    }
+//  }
+//}
 
-void controlEvent(ControlEvent theEvent) {
+// TODO refactor
+void controlEvent(ControlEvent theEvent) { //<>//
   // getting the input from the text box
-  if (theEvent.isAssignableFrom(Textfield.class)) {
+  if (theEvent.isAssignableFrom(Textfield.class)) { //<>//
     inputWord = theEvent.getStringValue();
     println("controlEvent: accessing a string from controller '"
       +theEvent.getName()+"': "
@@ -110,6 +91,7 @@ void controlEvent(ControlEvent theEvent) {
     // check if the Event was triggered from a ControlGroup
     println("event from group : "+theEvent.getGroup().getValue()+" from "+theEvent.getGroup());
   } else if (theEvent.isController()) {
+    selectedFont=fontList[(int)theEvent.getController().getValue()];
     println("event from controller : "+theEvent.getController().getValue()+" from "+theEvent.getController());
   }
 }
