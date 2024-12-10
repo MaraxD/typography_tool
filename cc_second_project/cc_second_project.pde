@@ -2,22 +2,14 @@
 import controlP5.*;
 import java.util.List;
 
-ControlP5 cp5;
-ControlP5 guiControllers;
-
-int y=20;
-int spacing=60;
+int y=20, spacing=60, fontListSize, i=0, rgbValues;
 PFont font, textFont;
 String inputWord="", selectedFont="Serif";
-int fontListSize, i=0;
 String[] fontList;
-DropdownList dropDownElement;
-Button colorButton;
-boolean isDLOpen=true, btnClicked=false;
+boolean isDLOpen=true, btnClicked=false, fontChanged=false, fontSizeChanged=false, colorChanged=false;
 ArrayList<Object> letterCoordinatesDict;
-boolean fontChanged=false, fontSizeChanged=false;
-Slider fontSizeSlider;
-float selectedFontSize=30;
+float selectedFontSize=30, easing=0.05;
+color selectedColor;
 
 void setup() {
   size(600, 600);
@@ -38,11 +30,23 @@ void draw() {
     //bottom line
     line(0, height-50, width, height-50);
 
-    // draw in the selected size
-    if (selectedFontSize != 30 && fontSizeChanged) {
+    // color in the selected shade
+    if (colorChanged) {
+      fill(selectedColor);
       for (int i=0; i<letterCoordinatesDict.size(); i+=3) {
         text((char)letterCoordinatesDict.get(i), (float)letterCoordinatesDict.get(i+1), (float)letterCoordinatesDict.get(i+2));
       }
+      colorChanged=false;//reset the color 
+    }
+
+    // draw in the selected size
+    if (selectedFontSize != 30) {
+      textFont(textFont, selectedFontSize);
+      for (int j=0; j<letterCoordinatesDict.size(); j+=3) {
+        text((char)letterCoordinatesDict.get(j), (float)letterCoordinatesDict.get(j+1), (float)letterCoordinatesDict.get(j+2));
+      }
+      // 'resetting' the values of the cursor
+      selectedFontSize=30;
     }
 
     // draw in the selected font
@@ -61,9 +65,8 @@ void draw() {
     }
 
 
+
     textFont(textFont, selectedFontSize);
-
-
     // time to draw when the mouse is pressed
     // all the first presses of the button should write out the word
     if (mousePressed) {
@@ -85,7 +88,7 @@ void draw() {
   } else {
     // animate the intro text
     fill(color(255, 240, 209));
-    stroke(color(255, 240, 209));
+    noStroke();
     rect(width/2-130, height/2-160, width+200, 60 );
     delay(200);
 
@@ -112,11 +115,12 @@ void controlEvent(ControlEvent theEvent) {
       +theEvent.getStringValue()
       );
   }
-
+  
   if (theEvent.isGroup()) {
     // check if the Event was triggered from a ControlGroup
     println("event from group : "+theEvent.getGroup().getValue()+" from "+theEvent.getGroup());
   } else if (theEvent.isController()) {
+    // TODO REFACTOR!!!!!!
     if (theEvent.isFrom(dropDownElement)) {
       //if a font from the drop down list was selected
       selectedFont=fontList[(int)theEvent.getController().getValue()];
@@ -124,8 +128,28 @@ void controlEvent(ControlEvent theEvent) {
       fontChanged=true;
     } else if (theEvent.isFrom(fontSizeSlider)) {
       selectedFontSize=theEvent.getController().getValue();
+      background(color(255, 240, 209));
       fontSizeChanged=true;
+    } else if (theEvent.isFrom(clearButton)) {
+      background(color(255, 240, 209));
+    } else if (theEvent.isFrom(colorButton)) {
+      // show different small buttons with colors
+      colorButtonOptions.show();
+    } 
+    
+    if (theEvent.getController().getLabel().contains("colorOptions")) {
+      rgbValues=(int)theEvent.getController().getValue();
+      // bitwise shift to get the colors from the memory
+      int red=(rgbValues>>16)& 0xFF;
+      int green=(rgbValues>>8)  & 0xFF;
+      int blue=rgbValues & 0xFF;
+      selectedColor=color(red, green, blue);
+      colorChanged=true;
     }
+    
+    println(theEvent.getController().getLabel());
+
+    //selectedColor=0xsplit(theEvent.getController().getLabel(), '-')[1];
     println("event from controller : "+theEvent.getController().getValue()+" from "+theEvent.getController());
   }
 }
