@@ -1,4 +1,4 @@
-Slider fontSizeSlider; //<>//
+Slider fontSizeSlider; //<>// //<>//
 DropdownList dropDownElement;
 Button colorButton, clearButton, surprizeMeButton;
 ControlP5 cp5, guiControllers, colorButtonOptions;
@@ -61,8 +61,9 @@ void gui() {
   // create font option list
   dropDownElement=guiControllers.addDropdownList("Font")
     .setPosition(width-240, 10)
-    .setItemHeight(25)
-    .setBarHeight(30);
+    //.setItemHeight(25)
+    .setBarHeight(30)
+    .close();
   customizeDropdownList(dropDownElement);
 
   for (int i=0; i<fontListSize; i++) {
